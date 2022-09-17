@@ -1,9 +1,12 @@
+import { MantineProvider } from '@mantine/core';
 import Hits from './Hits';
 
 const App = () => (
-  <div>
-    <Hits />
-  </div>
+  <MantineProvider withGlobalStyles withNormalizeCSS>
+    <div>
+      <Hits />
+    </div>
+  </MantineProvider>
 );
 
 export default App;
