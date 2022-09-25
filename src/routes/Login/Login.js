@@ -8,11 +8,16 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useState } from 'react';
 
 const Login = () => {
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const grayColor = useColorModeValue('gray.800', 'gray.400');
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const email = event.target.elements.email.value;
+    setIsEmailSent(true);
 
     // POST a request with the users email or phone number to the server
     fetch('/mail', {
@@ -43,41 +48,51 @@ const Login = () => {
         align={'center'}
         justify={'center'}
         bg={useColorModeValue('gray.50', 'gray.800')}>
-        <Stack
-          boxShadow={'lg'}
-          maxW={'md'}
-          my={12}
-          p={6}
-          rounded={'xl'}
-          spacing={4}
-          w={'full'}>
-          <Heading lineHeight={1.1} fontSize={{ base: '2xl', md: '3xl' }}>
-            Sign in
-          </Heading>
-          <Text
-            color={useColorModeValue('gray.800', 'gray.400')}
-            fontSize={{ base: 'sm', sm: 'md' }}>
-            You&apos;ll get an email with a login link
-          </Text>
-          <FormControl id="email">
-            <Input
-              placeholder="your-email@example.com"
-              _placeholder={{ color: 'gray.500' }}
-              type="email"
-            />
-          </FormControl>
-          <Stack spacing={6}>
-            <Button
-              bg={'blue.400'}
-              color={'white'}
-              type="submit"
-              _hover={{
-                bg: 'blue.500',
-              }}>
-              Login
-            </Button>
+        {!isEmailSent && (
+          <Stack
+            boxShadow={'lg'}
+            maxW={'md'}
+            my={12}
+            p={6}
+            rounded={'xl'}
+            spacing={4}
+            w={'full'}>
+            <Heading lineHeight={1.1} fontSize={{ base: '2xl', md: '3xl' }}>
+              Sign in
+            </Heading>
+            <Text color={grayColor} fontSize={{ base: 'sm', sm: 'md' }}>
+              You&apos;ll get an email with a login link
+            </Text>
+            <FormControl id="email">
+              <Input
+                placeholder="your-email@example.com"
+                _placeholder={{ color: 'gray.500' }}
+                type="email"
+              />
+            </FormControl>
+            <Stack spacing={6}>
+              <Button
+                bg={'blue.400'}
+                color={'white'}
+                type="submit"
+                _hover={{
+                  bg: 'blue.500',
+                }}>
+                Login
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
+        )}
+        {isEmailSent && (
+          <Stack textAlign="center">
+            <Heading lineHeight={1.1} fontSize={{ base: '2xl', md: '3xl' }}>
+              Email sent
+            </Heading>
+            <Text color={grayColor} fontSize={{ base: 'sm', sm: 'md' }}>
+              You&apos;ll get an email with a login link
+            </Text>
+          </Stack>
+        )}
       </Flex>
     </form>
   );

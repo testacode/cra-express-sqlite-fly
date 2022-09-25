@@ -16,6 +16,7 @@ let db;
     driver: sqlite3.Database,
   });
 
+  // https://github.com/kriasoft/node-sqlite#migrations
   await db.migrate();
 })();
 
@@ -83,7 +84,7 @@ const sendEmail = ({ to = 'example@email.com' }) => {
     },
   });
 
-  const url = `https://morning-surf-1780.fly.dev/auth/token/${process.env.TOKEN}`;
+  const url = `${process.env.BASE_URL}/auth/token/${process.env.TOKEN}`;
 
   const mailOptions = {
     from: '"Example Team" <from@example.com>',
@@ -102,10 +103,9 @@ const sendEmail = ({ to = 'example@email.com' }) => {
 };
 
 app.post('/mail', (req, res) => {
-  if (
-    process.env.ADMIN_ACCOUNT.trim().toLowerCase()
-    === req.body.email.trim().toLowerCase()
-  ) {
+  const adminEmail = process.env.ADMIN_ACCOUNT.trim().toLowerCase();
+  const reqEmail = req.body.email.trim().toLowerCase();
+  if (adminEmail === reqEmail) {
     sendEmail({ to: req.body.email });
     return res.json({ status: 201 });
   }
@@ -124,9 +124,20 @@ app.get('/protected', (req, res) => {
   res.sendStatus(401);
 });
 
+app.get('/profile', (req, res) => {
+  console.log('profile: ', {
+    reqCookie: req.cookies,
+    process: process.env.TOKEN,
+  });
+  if (req.cookies.token === process.env.TOKEN) {
+    return res.json({ status: 201 });
+  }
+  res.sendStatus(401);
+});
+
 app.get('/auth/token/:token', (req, res) => {
   if (req.params.token === process.env.TOKEN) {
-    return res.cookie('token', req.params.token).send('Cookie is set');
+    return res.cookie('token', req.params.token).redirect(process.env.BASE_URL);
   }
 
   return res.sendStatus(401);
