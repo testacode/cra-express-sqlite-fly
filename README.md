@@ -6,10 +6,12 @@
 # using node 16
 git clone git@github.com:facutk/cra-express-sqlite-fly.git
 cd cra-express-sqlite-fly/api
+npm install
 npm start
 
 # in other terminal
 cd cra-express-sqlite-fly/api
+npm install
 npm start
 ```
 
