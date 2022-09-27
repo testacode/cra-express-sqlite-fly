@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const cookieParser = require('cookie-parser');
+const CookieStrategy = require('passport-cookie').Strategy;
 
 const nodemailer = require('nodemailer');
 // const MagicLoginStrategy = require('passport-magic-login');
@@ -23,12 +24,25 @@ let db;
 // const token = process.env.TOKEN || 'blabla';
 
 const app = express();
+const passport = require('passport');
 const port = process.env.port || 8080;
 
 app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+const cookieInstance = new CookieStrategy(function (token, done) {
+  console.log({ tokenlala: token });
+  if (token === process.env.TOKEN) {
+    return done(null, token);
+  }
+  return done('error');
+});
+
+passport.use(cookieInstance);
+
+app.use(passport.initialize());
 
 app.get('/', (request, response) => {
   response.header(
@@ -114,26 +128,22 @@ app.post('/mail', (req, res) => {
 });
 
 app.get('/protected', (req, res) => {
-  console.log('protected: ', {
-    reqCookie: req.cookies,
-    process: process.env.TOKEN,
-  });
   if (req.cookies.token === process.env.TOKEN) {
     return res.sendStatus(200);
   }
   res.sendStatus(401);
 });
 
-app.get('/profile', (req, res) => {
-  console.log('profile: ', {
-    reqCookie: req.cookies,
-    process: process.env.TOKEN,
-  });
-  if (req.cookies.token === process.env.TOKEN) {
-    return res.json({ status: 201 });
+app.get(
+  '/profile',
+  passport.authenticate('cookie', { session: false }),
+  (req, res) => {
+    if (req.cookies.token === process.env.TOKEN) {
+      return res.json({ status: 201 });
+    }
+    res.sendStatus(401);
   }
-  res.sendStatus(401);
-});
+);
 
 app.get('/auth/token/:token', (req, res) => {
   if (req.params.token === process.env.TOKEN) {
