@@ -12,7 +12,6 @@ processes = []
   PORT = "8080"
   NODE_ENV = "production"
   DATABASE_PATH = "/data/sqlite.db"
-  ADMIN_ACCOUNT = "bastadespammers@gmail.com"
   BASE_URL = "https://morning-surf-1780.fly.dev"
 
 [experimental]
